@@ -9,3 +9,5 @@ I will use only **train.csv**
 since there is no label in **test.csv**
 <br>The data is about 6.1 GB so I won't include whole dataset in repo.
 <br>I will use only a subset of data to work on capstone project
+
+There is a [data dictionary](/data%20dictionary.odt) in this repo to see what information is in this data.

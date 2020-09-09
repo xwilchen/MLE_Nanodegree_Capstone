@@ -11,3 +11,6 @@ since there is no label in **test.csv**
 <br>I will use only a subset of data to work on capstone project
 
 There is a [data dictionary](/data%20dictionary.odt) in this repo to see what information is in this data.
+
+## Technologies
+- Spark, [Linux Installation Guide](https://www.tutorialspoint.com/apache_spark/apache_spark_installation.htm)

@@ -98,7 +98,7 @@ class EDA():
         -------
         None
         """
-        df = raw_df.select(prime_id, col, "label_int").groupBy("uid", col).agg({"*": "count", "label_int": "sum"}).toPandas()
+        df = raw_df.select(prime_id, col, "label_int").groupBy(prime_id, col).agg({prime_id: "count", "label_int": "sum"}).toPandas()
         df["ctr_group"] = df[prime_id].apply(lambda x: "high_ctr" if x in high_ctr_tags else "low_ctr")
         agg_df = df.groupby([col,"ctr_group"]).sum()
         agg_df = agg_df.reset_index()

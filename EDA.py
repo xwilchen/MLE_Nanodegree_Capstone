@@ -9,6 +9,20 @@ class EDA():
         self.target_ctr = target_ctr
 
     def id_analysis(raw_df, id_col):
+        """
+        plotting out distribution of id column and return a list of high CTR ids
+
+        Parameters
+        ----------
+        id_col str:
+            the id column of primary feature
+
+        Returns
+        -------
+        list
+            a list of high CTR ids
+        """
+
         df = raw_df.select(id_col, "label_int").groupBy(id_col).agg({"*": "count", "label_int": "sum"}).toPandas()
         df = df.set_index(id_col)
 
@@ -34,9 +48,26 @@ class EDA():
         sns.boxplot(x="ctr_qbin", y=f"{id_col}_ctr", data=df)
         plt.show()
         high_ctr_ids = df[df[f"{id_col}_ctr"] >= df[f"{id_col}_ctr"].quantile(0.75)].index
-        return high_ctr_ids
+        return list(high_ctr_ids)
 
     def cat_analysis(self,raw_df,col,prime_id):
+        """
+        plotting out the CTR distribution of each category
+
+        Parameters
+        ----------
+        raw_df spark dataframe:
+            the spark data frame to query data
+        col str:
+            the column want to analyze
+        prime_id:
+            id of major feature
+
+        Returns
+        -------
+        None
+        """
+
         dist = raw_df[prime_id,col].groupBy(col).agg(F.countDistinct(prime_id)).toPandas()
         dist.set_index(col).sort_index().plot.bar()
         plt.show()
@@ -47,9 +78,27 @@ class EDA():
         plt.hlines(self.target_ctr, -1, 1000,linestyles='dashed',colors="r")
         plt.show()
 
-    def high_low_ctr_group_dist(self,raw_df,col,prime_col,high_ctr_tags):
-        df = raw_df.select(prime_col,col,"label_int").groupBy("uid",col).agg({"*":"count","label_int":"sum"}).toPandas()
-        df["ctr_group"] = df[prime_col].apply(lambda x: "high_ctr" if x in high_ctr_tags else "low_ctr")
+    def high_low_ctr_group_dist(self, raw_df, col, prime_id, high_ctr_tags):
+        """
+        plotting out the distribution of high low ctr group in specific column
+
+        Parameters
+        ----------
+        raw_df spark dataframe:
+            the spark data frame to query data
+        col str:
+            the column want to analyze
+        prime_id str:
+            id of major feature
+        high_ctr_tags list:
+             the ids of high ctr group
+
+        Returns
+        -------
+        None
+        """
+        df = raw_df.select(prime_id, col, "label_int").groupBy("uid", col).agg({"*": "count", "label_int": "sum"}).toPandas()
+        df["ctr_group"] = df[prime_id].apply(lambda x: "high_ctr" if x in high_ctr_tags else "low_ctr")
         agg_df = df.groupby([col,"ctr_group"]).sum()
         agg_df = agg_df.reset_index()
         high = agg_df[agg_df["ctr_group"] == "high_ctr"]

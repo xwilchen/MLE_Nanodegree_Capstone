@@ -57,5 +57,6 @@ class EDA():
         low = agg_df[agg_df["ctr_group"] == "low_ctr"]
         low = low.set_index(col)["count(1)"].sum()
         agg_df["count_pct"] = np.where(agg_df["ctr_group"] == "high_ctr",agg_df["count(1)"]/high,agg_df["count(1)"]/low)
+        print("High Low CTR Group Distribution")
         sns.barplot(x=col,y="count_pct",hue="ctr_group",data=agg_df)
         plt.show()

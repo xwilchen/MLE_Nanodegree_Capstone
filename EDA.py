@@ -5,10 +5,10 @@ import seaborn as sns
 from pyspark.sql import functions as F
 
 class EDA():
-    def __init__(self,target_ctr):
+    def __init__(self, target_ctr):
         self.target_ctr = target_ctr
 
-    def id_analysis(raw_df, id_col):
+    def id_analysis(self, raw_df, id_col):
         """
         plotting out distribution of id column and return a list of high CTR ids
 
@@ -47,6 +47,7 @@ class EDA():
         # see how is high ctr group performing
         sns.boxplot(x="ctr_qbin", y=f"{id_col}_ctr", data=df)
         plt.show()
+        # define ctr over 3rd quartile is high ctr
         high_ctr_ids = df[df[f"{id_col}_ctr"] >= df[f"{id_col}_ctr"].quantile(0.75)].index
         return list(high_ctr_ids)
 

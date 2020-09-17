@@ -80,7 +80,7 @@ class EDA():
         plt.hlines(self.target_ctr, -1, 1000,linestyles='dashed',colors="r")
         plt.show()
 
-    def high_low_ctr_group_dist(self, raw_df, col, prime_id, high_ctr_tags):
+    def high_low_ctr_group_dist(self, raw_df, col, prime_id, high_ctr_ids,low_ctr_ids):
         """
         plotting out the distribution of high low ctr group in specific column
 
@@ -92,22 +92,28 @@ class EDA():
             the column want to analyze
         prime_id str:
             id of major feature
-        high_ctr_tags list:
+        high_ctr_ids list:
              the ids of high ctr group
-
+        low_ctr_ids list:
+             the ids of low ctr group
         Returns
         -------
         None
         """
-        df = raw_df.select(prime_id, col, "label_int").groupBy(prime_id, col).agg({prime_id: "count", "label_int": "sum"}).toPandas()
-        df["ctr_group"] = df[prime_id].apply(lambda x: "high_ctr" if x in high_ctr_tags else "low_ctr")
-        agg_df = df.groupby([col,"ctr_group"]).sum()
-        agg_df = agg_df.reset_index()
+        df = raw_df.select(prime_id, col, "label_int").groupBy(prime_id, col)\
+            .agg({prime_id: "count", "label_int": "sum"}).toPandas()
+        high_df = df.set_index("uid").loc[high_ctr_ids].groupby(col).sum()
+        high_df["ctr_group"] = "high_ctr"
+        low_df = df.set_index("uid").loc[low_ctr_ids].groupby(col).sum()
+        low_df["ctr_group"] = "low_ctr"
+        agg_df = pd.concat((high_df, low_df), axis=0).reset_index()
         high = agg_df[agg_df["ctr_group"] == "high_ctr"]
-        high = high.set_index(col)["count(1)"].sum()
+        high = high.set_index(col)[f"count({prime_id})"].sum()
         low = agg_df[agg_df["ctr_group"] == "low_ctr"]
-        low = low.set_index(col)["count(1)"].sum()
-        agg_df["count_pct"] = np.where(agg_df["ctr_group"] == "high_ctr",agg_df["count(1)"]/high,agg_df["count(1)"]/low)
+        low = low.set_index(col)[f"count({prime_id})"].sum()
+        agg_df["count_pct"] = np.where(agg_df["ctr_group"] == "high_ctr",
+                                       agg_df[f"count({prime_id})"] / high,
+                                       agg_df[f"count({prime_id})"] / low)
         print("High Low CTR Group Distribution")
-        sns.barplot(x=col,y="count_pct",hue="ctr_group",data=agg_df)
+        sns.barplot(x=col, y="count_pct", hue="ctr_group", data=agg_df)
         plt.show()

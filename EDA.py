@@ -49,7 +49,8 @@ class EDA():
         plt.show()
         # define ctr over 3rd quartile is high ctr
         high_ctr_ids = df[df[f"{id_col}_ctr"] >= df[f"{id_col}_ctr"].quantile(0.75)].index
-        return list(high_ctr_ids)
+        low_ctr_ids = df[df[f"{id_col}_ctr"] < df[f"{id_col}_ctr"].quantile(0.75)].index
+        return (list(high_ctr_ids), list(low_ctr_ids))
 
     def cat_analysis(self,raw_df,col,prime_id):
         """

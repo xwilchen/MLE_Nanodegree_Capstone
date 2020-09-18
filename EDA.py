@@ -102,7 +102,7 @@ class EDA():
         """
         df = raw_df.select(prime_id, col, "label_int").groupBy(prime_id, col)\
             .agg({prime_id: "count", "label_int": "sum"}).toPandas()
-        high_df = df.set_index("uid").loc[high_ctr_ids].groupby(col).sum()
+        high_df = df.set_index(prime_id).loc[high_ctr_ids].groupby(col).sum()
         high_df["ctr_group"] = "high_ctr"
         low_df = df.set_index("uid").loc[low_ctr_ids].groupby(col).sum()
         low_df["ctr_group"] = "low_ctr"
@@ -115,5 +115,6 @@ class EDA():
                                        agg_df[f"count({prime_id})"] / high,
                                        agg_df[f"count({prime_id})"] / low)
         print("High Low CTR Group Distribution")
-        sns.barplot(x=col, y="count_pct", hue="ctr_group", data=agg_df)
+        agg_df[col] = agg_df[col].astype('int32')
+        sns.barplot(col, y="count_pct", hue="ctr_group", data=agg_df)
         plt.show()

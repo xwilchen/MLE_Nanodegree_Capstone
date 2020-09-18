@@ -74,12 +74,15 @@ class EDA():
         dist[col] = dist[col].astype(int)
         dist.set_index(col).sort_index().plot.bar()
         plt.show()
-        count = raw_df.select(col).groupBy(col).count().toPandas().set_index(col)
-        count.index = count.index.astype(int)
-        click = raw_df.select(col,"label_int").groupBy(col).sum("label_int").toPandas().set_index(col)
+        count = raw_df.select(col).groupBy(col).count().toPandas()
+        count[col] = count[col].astype(int)
+        count = count.set_index(col)
+        click = raw_df.select(col,"label_int").groupBy(col).sum("label_int").toPandas()
+        click[col] = click[col].astype(int)
+        click = click.set_index(col)
         count.index = click.index.astype(int)
         print("CTR")
-        df = (click.iloc[:,0]/count.iloc[:,0]).sort_index().plot.bar()
+        (click.iloc[:,0]/count.iloc[:,0]).sort_index().plot.bar()
         plt.hlines(self.target_ctr, -1, 1000,linestyles='dashed',colors="r")
         plt.show()
 
@@ -107,7 +110,7 @@ class EDA():
             .agg({prime_id: "count", "label_int": "sum"}).toPandas()
         high_df = df.set_index(prime_id).loc[high_ctr_ids].groupby(col).sum()
         high_df["ctr_group"] = "high_ctr"
-        low_df = df.set_index("uid").loc[low_ctr_ids].groupby(col).sum()
+        low_df = df.set_index(prime_id).loc[low_ctr_ids].groupby(col).sum()
         low_df["ctr_group"] = "low_ctr"
         agg_df = pd.concat((high_df, low_df), axis=0).reset_index()
         high = agg_df[agg_df["ctr_group"] == "high_ctr"]

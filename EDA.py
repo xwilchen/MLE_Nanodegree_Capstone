@@ -71,12 +71,15 @@ class EDA():
         """
 
         dist = raw_df[prime_id,col].groupBy(col).agg(F.countDistinct(prime_id)).toPandas()
+        dist[col] = dist[col].astype(int)
         dist.set_index(col).sort_index().plot.bar()
         plt.show()
         count = raw_df.select(col).groupBy(col).count().toPandas().set_index(col)
+        count.index = count.index.astype(int)
         click = raw_df.select(col,"label_int").groupBy(col).sum("label_int").toPandas().set_index(col)
+        count.index = click.index.astype(int)
         print("CTR")
-        (click.iloc[:,0]/count.iloc[:,0]).sort_index().plot.bar()
+        df = (click.iloc[:,0]/count.iloc[:,0]).sort_index().plot.bar()
         plt.hlines(self.target_ctr, -1, 1000,linestyles='dashed',colors="r")
         plt.show()
 

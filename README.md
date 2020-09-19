@@ -1,4 +1,4 @@
-# Capstone Project - Machine Learning Engineer Nanodegree
+# Machine Learning Engineer Nanodegree Capstone Project - Ads CTR Prediction
 
 # Data
 The data is downloaded form

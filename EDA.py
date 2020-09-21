@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pyspark.sql import functions as F
-
+from scipy.stats import chi2_contingency
 
 class EDA():
     def __init__(self, target_ctr):
@@ -148,3 +148,10 @@ class EDA():
                                   columns=col2)
         sns.heatmap(pivot_df, cmap="YlOrBr", annot=pivot_df.values)
         plt.show()
+
+    def chi_square_analysis(self,raw_df, col1, col2):
+        df = raw_df.select(col1, col2) \
+            .groupBy(col1, col2).count().toPandas()
+        pivot_df = pd.pivot_table(df, values='count', index=col1, columns=col2)
+        pivot_df = pivot_df.fillna(0)
+        return chi2_contingency(pivot_df)

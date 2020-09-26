@@ -127,7 +127,7 @@ class EDA():
         plt.show()
 
     def click_not_click_distrubitions(self, raw_df, col):
-        print("distritubtions of click or not")
+        print("distributions of click or not")
         df = raw_df.select(col, "label").groupBy("label", col).count().toPandas()
         df = pd.merge(df, df.groupby("label").sum(), on='label')
         df['pct'] = df['count_x'] / df['count_y']
